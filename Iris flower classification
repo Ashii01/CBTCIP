@@ -1,0 +1,38 @@
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
+from sklearn.model_selection import train_test_split
+import pandas as pd
+
+dataset = pd.read_csv('iris.csv')
+
+x = dataset.iloc[:, [2, 3]].values
+y = dataset.iloc[:, 4].values
+
+print("Unique values in y before conversion:", pd.unique(y))
+
+if y.dtype == float or y.dtype == int:
+    y = y.astype(str)
+
+print("Unique values in y after conversion:", pd.unique(y))
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
+
+classifier = KNeighborsClassifier(n_neighbors=11, p=2, metric='euclidean')
+
+classifier.fit(x_train, y_train)
+
+y_pred = classifier.predict(x_test)
+
+cm = confusion_matrix(y_test, y_pred)
+print('Confusion matrix is as follows\n', cm)
+
+print('Accuracy Metrics')
+print(classification_report(y_test, y_pred))
+print("Correct prediction:", accuracy_score(y_test, y_pred))
+
+new_sample = [[1.4, 0.1]]
+predicted_species = classifier.predict(new_sample)
+print(f"The predicted species for the sample {new_sample} is: {predicted_species[0]}")
+
+dataset['Predicted Species'] = classifier.predict(x)
+print(dataset.head())
